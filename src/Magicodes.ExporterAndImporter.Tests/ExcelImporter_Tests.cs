@@ -58,11 +58,11 @@ namespace Magicodes.ExporterAndImporter.Tests
 
             using (var pck = new ExcelPackage(new FileInfo(filePath)))
             {
-                pck.Workbook.Worksheets.Count.ShouldBe(1);
+                pck.Workbook.Worksheets.Count.ShouldBe(3);
                 var sheet = pck.Workbook.Worksheets.First();
                 var dataValidataions = sheet.DataValidations.FirstOrDefault()
                     as OfficeOpenXml.DataValidation.ExcelDataValidationList;
-                new List<string> { "男0", "女1" }.ShouldBe(dataValidataions.Formula.Values);
+                dataValidataions.Formula.ExcelFormula.ShouldBe("hidden_Gender!$A$1:$A$2");
             }
             //TODO:读取Excel检查表头和格式
         }
@@ -101,7 +101,7 @@ namespace Magicodes.ExporterAndImporter.Tests
             File.Exists(filePath).ShouldBeTrue();
             using (var pck = new ExcelPackage(new FileInfo(filePath)))
             {
-                pck.Workbook.Worksheets.Count.ShouldBe(1);
+                pck.Workbook.Worksheets.Count.ShouldBe(3);
                 var sheet = pck.Workbook.Worksheets.First();
                 var attr = typeof(ImportStudentDtoWithSheetDesc).GetAttribute<ExcelImporterAttribute>();
                 var text = sheet.Cells["A1"].Text.Replace("\n", string.Empty).Replace("\r", string.Empty);
@@ -869,6 +869,34 @@ namespace Magicodes.ExporterAndImporter.Tests
             import.Data.ElementAt(0).Name1.ShouldBe(import.Data.ElementAt(0).Name);
         }
 
+        /// <summary>
+        /// https://github.com/dotnetcore/Magicodes.IE/issues/182
+        /// </summary>
+        /// <returns></returns>
+        [Fact(DisplayName = "导入数量限制测试")]
+        public async Task ImportMaxCountLimit_Test()
+        {
+            IExporter exporter = new ExcelExporter();
+            var filePath = Path.Combine(Directory.GetCurrentDirectory(), nameof(ImportMaxCountLimit_Test) + ".xlsx");
+            if (File.Exists(filePath)) File.Delete(filePath);
+
+            var result = await exporter.Export(filePath, GenFu.GenFu.ListOf<ImportMaxCountLimitDto>(50001));
+            result.ShouldNotBeNull();
+            File.Exists(filePath).ShouldBeTrue();
+
+            var importResult = await Importer.Import<ImportMaxCountLimitDto>(filePath);
+            importResult.HasError.ShouldBeFalse();
+        }
+
+
+        [Fact(DisplayName = "ColumnIndex测试")]
+        public async Task ImportTestColumnIndex_Test()
+        {
+            var filePath = Path.Combine(Directory.GetCurrentDirectory(), "TestFiles", "Import", "ColumnIndex导入测试.xlsx");
+            var import = await Importer.Import<ImportTestColumnIndex>(filePath);
+            import.HasError.ShouldBeFalse();
+            import.ImporterHeaderInfos.Count.ShouldBe(2);
+        }
 
     }
 }

@@ -16,6 +16,7 @@ using Magicodes.ExporterAndImporter.Core.Filters;
 using Magicodes.ExporterAndImporter.Core.Models;
 using Magicodes.ExporterAndImporter.Excel;
 using System;
+using OfficeOpenXml.Table;
 
 namespace Magicodes.ExporterAndImporter.Tests.Models.Export
 {
@@ -36,7 +37,7 @@ namespace Magicodes.ExporterAndImporter.Tests.Models.Export
         }
     }
 
-    [ExcelExporter(Name = "测试", TableStyle = "Light10", AutoFitAllColumn = true, AutoFitMaxRows = 5000)]
+    [ExcelExporter(Name = "测试", TableStyle =TableStyles.Dark10, AutoFitAllColumn = true, AutoFitMaxRows = 5000)]
     public class ExportTestDataWithAttrs
     {
         [ExporterHeader(DisplayName = "加粗文本", IsBold = true)]
@@ -45,7 +46,7 @@ namespace Magicodes.ExporterAndImporter.Tests.Models.Export
         [ExporterHeader(DisplayName = "忽略", IsIgnore = true)]
         public string Text3 { get; set; }
         [ExporterHeader(DisplayName = "数值", Format = "#,##0")]
-        public decimal Number { get; set; }
+        public int Number { get; set; }
         [ExporterHeader(DisplayName = "名称", IsAutoFit = true)]
         public string Name { get; set; }
 
