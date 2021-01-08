@@ -61,7 +61,7 @@ namespace Magicodes.ExporterAndImporter.Tests
         }
 
 
-        [Fact(DisplayName = "DTO特性导出（测试格式化）")]
+        [Fact(DisplayName = "DTO特性导出（测试格式化以及列头索引）")]
         public async Task AttrsExport_Test()
         {
             IExporter exporter = new ExcelExporter();
@@ -84,7 +84,7 @@ namespace Magicodes.ExporterAndImporter.Tests
                 pck.Workbook.Worksheets.Count.ShouldBe(1);
                 var sheet = pck.Workbook.Worksheets.First();
                 sheet.Cells[sheet.Dimension.Address].Rows.ShouldBe(101);
-                sheet.Cells["A2"].Text.ShouldBe(data[0].Text);
+                sheet.Cells["A2"].Text.ShouldBe(data[0].Text2);
 
                 //[ExporterHeader(DisplayName = "日期1", Format = "yyyy-MM-dd")]
                 sheet.Cells["E2"].Text.Equals(DateTime.Parse(sheet.Cells["E2"].Text).ToString("yyyy-MM-dd"));
@@ -102,7 +102,36 @@ namespace Magicodes.ExporterAndImporter.Tests
 
                 var tb = sheet.Tables.First();
                 tb.Columns.Count.ShouldBe(9);
-                tb.Columns.First().Name.ShouldBe("加粗文本");
+                tb.Columns.First().Name.ShouldBe("普通文本");
+
+                sheet.Tables.First();
+                tb.Columns.Count.ShouldBe(9);
+                tb.Columns[2].Name.ShouldBe("加粗文本");
+            }
+        }
+
+
+        [Fact(DisplayName = "导出字段顺序测试")]
+        public async Task ExportByColumnIndex_Test()
+        {
+            var exporter = new ExcelExporter();
+            var filePath = GetTestFilePath($"{nameof(ExportByColumnIndex_Test)}.xlsx");
+            DeleteFile(filePath);
+
+            var data = GenFu.GenFu.ListOf<Issue179>(100);
+            var result = await exporter.Export(filePath, data);
+            result.ShouldNotBeNull();
+            File.Exists(filePath).ShouldBeTrue();
+            using (var pck = new ExcelPackage(new FileInfo(filePath)))
+            {
+                pck.Workbook.Worksheets.Count.ShouldBe(1);
+                var sheet = pck.Workbook.Worksheets.First();
+                sheet.Tables.Count.ShouldBe(1);
+
+                var tb = sheet.Tables.First();
+                tb.Columns.Count.ShouldBe(typeof(Issue179).GetProperties().Where(p => !p.GetAttribute<ExporterHeaderAttribute>().IsIgnore).Count());
+                tb.Columns.First().Name.ShouldBe("员工姓名");
+                tb.Columns[1].Name.ShouldBe("料号");
             }
         }
 

@@ -1,5 +1,16 @@
 # Release Log
 
+## 2.5.1.3
+
+**2021.01.02**
+- Add PDF support for paper size
+- Add PDF support for margins [#223](https://github.com/dotnetcore/Magicodes.IE/issues/223)
+
+## 2.5.1
+
+**2020.12.21**
+- 导出支持使用ColumnIndex指定导出顺序，以导出时在某些情况下顺序不一致的问题（Export supports the use of ColumnIndex to specify the export order, so that the order is inconsistent in some cases when exporting）  [#179](https://github.com/dotnetcore/Magicodes.IE/issues/179)
+
 ## 2.5.0
 
 **2020.12.03**

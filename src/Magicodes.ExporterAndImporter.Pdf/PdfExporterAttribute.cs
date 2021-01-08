@@ -63,5 +63,15 @@ namespace Magicodes.ExporterAndImporter.Pdf
         ///     底部设置
         /// </summary>
         public FooterSettings FooterSettings { get; set; }
+
+        /// <summary>
+        ///     边距设置
+        /// </summary>
+        public MarginSettings MarginSettings { get; set; }
+
+        /// <summary>
+        ///     纸张大小（仅在PaperKind=custom下生效）
+        /// </summary>
+        public PechkinPaperSize PaperSize { get; set; }
     }
 }
